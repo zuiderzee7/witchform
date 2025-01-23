@@ -77,7 +77,7 @@
     3. 상품명 : name
     4. 가격 : price
     5. 할인된 가격 : discounted_price
-    6. 할인 표출 형태 (- or %) : discount_formmat
+    6. 할인 표출 형태 (- or %) : discount_format
     7. 등록 시간 : created_dt
     8. 수정 시간 : updated_dt
     - SQL Table
@@ -89,7 +89,7 @@
             name VARCHAR(100) NOT NULL,
             price INT NOT NULL,
             discounted_price INT,
-            discount_formmat VARCHAR(10),
+            discount_format VARCHAR(10),
             created_dt DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_dt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (company_id) REFERENCES companies(id)

@@ -12,8 +12,8 @@ try {
     $file = basename($_SERVER['SCRIPT_NAME'], '.php');
     $viewPath = $dir ? $dir . '/' . $file : $file;
     view($viewPath, [
-        'title' => '관리자',
-        'dir'=> '/'.$dir
+        'title' => '관리자 상품 등록',
+        'dir'=> '/' . $dir
     ], '/admin');
 
 } catch (Exception $e) {
