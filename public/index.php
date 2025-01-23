@@ -12,6 +12,7 @@ try {
     $viewPath = $dir ? $dir . '/' . $file : $file;
     view($viewPath, [
         'title' => '홈페이지',
+        'dir'=> '/'.$dir
     ]);
 
 } catch (Exception $e) {
