@@ -1,7 +1,7 @@
 <?php
 namespace Database;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once BASE_PATH . '/vendor/autoload.php';
 use Dotenv\Dotenv;
 
 class Connection {
@@ -9,10 +9,10 @@ class Connection {
     private $pdo;
 
     private function __construct() {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+        $dotenv = Dotenv::createImmutable(BASE_PATH . '/');
         $dotenv->safeLoad();
 
-        $config = require __DIR__ . '/../../config/database.php';
+        $config = require BASE_PATH . '/config/database.php';
 
         try {
             $this->pdo = new \PDO(

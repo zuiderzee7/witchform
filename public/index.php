@@ -1,10 +1,19 @@
 <?php
-require_once __DIR__ . '/../src/Database/Connection.php';
-use Database\Connection;
+require_once __DIR__ . '/../src/bootstrap.php';
+//use Database\Connection;
 
 try {
-    $db = Connection::getInstance()->getConnection();
-    echo "데이터베이스 연결 테스트";
+    //디비 instance connection 처리
+    //$db = Connection::getInstance()->getConnection();
+
+    // 현재 파일명을 가져와서 기본 뷰 렌더링 명칭을 지정
+    $filename = basename($_SERVER['PHP_SELF'], '.php');
+    // 뷰 렌더링
+    view($filename, [
+        'title' => '홈페이지',
+    ]);
+
 } catch (Exception $e) {
-    echo "연결 실패: " . $e->getMessage();
+    error_log($e->getMessage());
+    echo $e->getMessage();
 }
