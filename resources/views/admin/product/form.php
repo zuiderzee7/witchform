@@ -1,3 +1,15 @@
+<?php
+// 세션이 시작되지 않았다면 세션 시작
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// CSRF 토큰 생성 (이미 생성되어 있다면 재사용)
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+?>
 <style>
     .price_format{
         position: relative;
@@ -36,6 +48,9 @@
             </div>
 
             <form id="productForm" action="/admin/product/api" method="POST" class="w-full max-w-4xl mx-auto p-4">
+                <!-- CSRF 토큰 전송 -->
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+
                 <?php if(isset($product)): ?>
                     <input type="hidden" name="_method" value="PUT">
                     <input type="hidden" name="id" value="<?= $product['id'] ?>">

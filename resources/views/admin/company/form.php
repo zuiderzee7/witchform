@@ -1,26 +1,16 @@
-<style>
-    .price_format{
-        position: relative;
-        width: 100%;
-    }
-    .price_format[data-format]:not([data-format=""]){
-        padding-right: 20px;
-    }
-    .price_format[data-format]:after{
-        content: attr(data-format);
-        position: absolute;
-        top: 0;
-        right: 6px;
-        display: flex;
-        align-items: center;
-        height: 42px;
-        font-size: 14px;
-    }
-    [data-before]::before{
-        content: attr(data-before);
-        font-size: 14px;
-    }
-</style>
+<?php
+// 세션이 시작되지 않았다면 세션 시작
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// CSRF 토큰 생성 (이미 생성되어 있다면 재사용)
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+?>
+
 <main class="container mx-auto">
     <div class="flex flex-col sm:flex-row gap-4">
         <?php include BASE_PATH . "/resources/layouts/admin/aside.php"; ?>
@@ -28,22 +18,29 @@
             <div class="flex justify-between py-2">
                 <h1 class="text-lg font-bold"><?= isset($company) ? '업체 수정' : '업체 추가' ?></h1>
                 <div>
-                    <a href="/admin/company" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center">
+                    <a href="/admin/company"
+                       class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center">
                         목록
                     </a>
                 </div>
             </div>
 
             <form id="companyForm" action="/admin/company/api" method="POST" class="w-full max-w-4xl mx-auto p-4">
+                <!-- CSRF 토큰 전송 -->
+                <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
+
                 <?php if(isset($company)): ?>
                     <input type="hidden" name="_method" value="PUT">
                     <input type="hidden" name="id" value="<?= $company['id'] ?>">
                 <?php endif; ?>
 
                 <ul class="w-full divide-y divide-gray-200">
+                    <!-- 업체명 -->
                     <li class="grid gap-4 py-4">
                         <div class="space-y-2">
-                            <label for="name" class="block text-sm font-medium text-gray-700">업체명 <span class="text-red-500">*</span></label>
+                            <label for="name" class="block text-sm font-medium text-gray-700">
+                                업체명 <span class="text-red-500">*</span>
+                            </label>
                             <input type="text" id="name" name="name"
                                    value="<?= isset($company) ? htmlspecialchars($company['name']) : '' ?>"
                                    required
@@ -52,9 +49,12 @@
                         </div>
                     </li>
 
+                    <!-- 이메일, 연락처 -->
                     <li class="grid grid-cols-2 gap-4 py-4">
                         <div class="space-y-2">
-                            <label for="email" class="block text-sm font-medium text-gray-700">이메일 <span class="text-red-500">*</span></label>
+                            <label for="email" class="block text-sm font-medium text-gray-700">
+                                이메일 <span class="text-red-500">*</span>
+                            </label>
                             <input type="email" id="email" name="email"
                                    value="<?= isset($company) ? htmlspecialchars($company['email']) : '' ?>"
                                    required
@@ -62,7 +62,9 @@
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div class="space-y-2">
-                            <label for="contact" class="block text-sm font-medium text-gray-700">연락처 <span class="text-red-500">*</span></label>
+                            <label for="contact" class="block text-sm font-medium text-gray-700">
+                                연락처 <span class="text-red-500">*</span>
+                            </label>
                             <input type="tel" id="contact" name="contact"
                                    value="<?= isset($company) ? htmlspecialchars($company['contact']) : '' ?>"
                                    required
@@ -72,6 +74,7 @@
                         </div>
                     </li>
 
+                    <!-- 우편번호, 주소 -->
                     <li class="grid gap-4 py-4">
                         <div class="space-y-2">
                             <label for="postal_code" class="block text-sm font-medium text-gray-700">우편번호</label>
@@ -82,7 +85,9 @@
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div class="space-y-2">
-                            <label for="address" class="block text-sm font-medium text-gray-700">주소 <span class="text-red-500">*</span></label>
+                            <label for="address" class="block text-sm font-medium text-gray-700">
+                                주소 <span class="text-red-500">*</span>
+                            </label>
                             <input type="text" id="address" name="address"
                                    value="<?= isset($company) ? htmlspecialchars($company['address']) : '' ?>"
                                    required
@@ -92,11 +97,13 @@
                     </li>
 
                     <?php if(!empty($_GET['error'])): ?>
-                        <li class="py-4">
+                        <li>
+                            <div class="font-bold">error.</div>
                             <div class="text-red-500 text-sm"><?= htmlspecialchars($_GET['error']) ?></div>
                         </li>
                     <?php endif; ?>
 
+                    <!-- 버튼 -->
                     <li class="py-4 flex justify-end space-x-2">
                         <button type="submit"
                                 class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
@@ -110,6 +117,7 @@
 </main>
 
 <script>
+    // 클라이언트 측 필수 필드 검사
     document.getElementById('companyForm').addEventListener('submit', function(e) {
         const requiredFields = ['name', 'email', 'contact', 'address'];
         let hasError = false;

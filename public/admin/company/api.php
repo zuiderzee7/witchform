@@ -2,9 +2,15 @@
 require_once $_SERVER['DOCUMENT_ROOT']. '/../src/bootstrap.php';
 use Database\Connection;
 
+// 세션이 시작되지 않았다면 시작 (bootstrap.php에서 이미 시작했을 수도 있음)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 try {
     $db = Connection::getInstance()->getConnection();
 
+    // _method 필드를 우선순위로 하여 HTTP 메서드를 결정
     $method = $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
 
     switch ($method) {
@@ -12,12 +18,17 @@ try {
             handleGet($db);
             break;
         case 'POST':
+            handleCsrf($_POST['_csrf_token'] ?? ''); // CSRF 체크
             handlePost($db);
             break;
         case 'PUT':
-            handlePut($db);
+            // PUT 데이터 파싱
+            parse_str(file_get_contents("php://input"), $_PUT);
+            handleCsrf($_PUT['_csrf_token'] ?? ''); // CSRF 체크
+            handlePut($db, $_PUT);
             break;
         case 'DELETE':
+            handleCsrf($_POST['_csrf_token'] ?? ''); // CSRF 체크
             handleDelete($db);
             break;
         default:
@@ -28,6 +39,9 @@ try {
     handleError($e);
 }
 
+/**
+ * GET 메소드 핸들러
+ */
 function handleGet($db) {
     $id = $_GET['id'] ?? null;
 
@@ -48,6 +62,9 @@ function handleGet($db) {
     exit;
 }
 
+/**
+ * POST 메소드 핸들러 (데이터 생성)
+ */
 function handlePost($db) {
     validateFields(['name', 'email', 'contact', 'address']);
 
@@ -64,14 +81,15 @@ function handlePost($db) {
     ]);
 
     if ($result) {
-        header('Location: /admin/company?success=create');
+        header('Location: /admin/company');
         exit;
     }
 }
 
-function handlePut($db) {
-    parse_str(file_get_contents("php://input"), $_PUT);
-
+/**
+ * PUT 메소드 핸들러 (데이터 수정)
+ */
+function handlePut($db, $_PUT) {
     if (!isset($_PUT['id'])) {
         throw new Exception('업체 ID가 필요합니다.');
     }
@@ -97,11 +115,14 @@ function handlePut($db) {
     ]);
 
     if ($result) {
-        header('Location: /admin/company?success=update');
+        header('Location: /admin/company');
         exit;
     }
 }
 
+/**
+ * DELETE 메소드 핸들러 (데이터 삭제)
+ */
 function handleDelete($db) {
     $id = $_POST['id'] ?? null;
 
@@ -121,13 +142,16 @@ function handleDelete($db) {
     $result = $stmt->execute(['id' => $id]);
 
     if ($result) {
-        header('Location: /admin/company?success=delete');
+        header('Location: /admin/company');
         exit;
     }
 
     throw new Exception('업체 삭제에 실패했습니다.');
 }
 
+/**
+ * 필수 필드 검증 함수
+ */
 function validateFields($required_fields, $data = null) {
     $data = $data ?? $_POST;
     $errors = [];
@@ -145,19 +169,34 @@ function validateFields($required_fields, $data = null) {
     return true;
 }
 
-function handleError($e) {
-    if (isAjaxRequest()) {
-        header('Content-Type: application/json');
-        http_response_code(400);
-        echo json_encode(['error' => $e->getMessage()]);
-    } else {
-        error_log($e->getMessage());
-        header('Location: ' . $_SERVER['HTTP_REFERER'] . '?error=' . urlencode($e->getMessage()));
+/**
+ * CSRF 토큰 검사 함수
+ */
+function handleCsrf($token) {
+    if (empty($token) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
+        throw new Exception('CSRF 토큰이 유효하지 않거나 없습니다.');
     }
-    exit;
 }
 
-function isAjaxRequest(): bool {
-    return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+/**
+ * 에러 핸들링 함수
+ */
+function handleError($e)
+{
+    error_log($e->getMessage());
+
+    $referer = $_SERVER['HTTP_REFERER'] ?? '/admin/company';
+
+    // 이미 쿼리 파라미터가 있는지 확인
+    if (strpos($referer, '?') !== false) {
+        // 기존 쿼리 파라미터가 있음 -> & 로 연결
+        $redirectUrl = $referer . '&error=' . urlencode($e->getMessage());
+    } else {
+        // 쿼리 파라미터가 없음 -> ? 로 연결
+        $redirectUrl = $referer . '?error=' . urlencode($e->getMessage());
+    }
+
+    // 최종 리다이렉트
+    header('Location: ' . $redirectUrl);
+    exit;
 }
