@@ -44,8 +44,12 @@
                 <ul class="w-full divide-y divide-gray-200">
                     <li class="grid gap-4 py-4">
                         <div class="space-y-2">
-                            <label for="company_id" class="block text-sm font-medium text-gray-700">업체</label>
-                            <select id="company_id" name="company_id" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <label for="company_id" class="block text-sm font-medium text-gray-700">업체 <span class="text-red-500">*</span></label>
+                            <select id="company_id"
+                                    name="company_id"
+                                    autocomplete="off"
+                                    required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">선택하세요</option>
                                 <?php foreach ($companies as $company): ?>
                                     <option value="<?= $company['id'] ?>" <?= isset($product) && $product['company_id'] == $company['id'] ? 'selected' : '' ?>>
@@ -58,34 +62,38 @@
 
                     <li class="grid gap-4 py-4">
                         <div class="space-y-2">
-                            <label for="name" class="block text-sm font-medium text-gray-700">상품명</label>
+                            <label for="name" class="block text-sm font-medium text-gray-700">상품명 <span class="text-red-500">*</span></label>
                             <input type="text" id="name" name="name"
                                    value="<?= isset($product) ? htmlspecialchars($product['name']) : '' ?>"
+                                   autocomplete="off"
+                                   required
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </li>
 
                     <li class="grid grid-cols-2 gap-4 py-4">
                         <div class="space-y-2">
-                            <label for="price" class="block text-sm font-medium text-gray-700">가격</label>
+                            <label for="price" class="block text-sm font-medium text-gray-700">가격 <span class="text-red-500">*</span></label>
                             <div class="price_format" data-format="원">
                                 <input type="number" id="price" name="price"
                                        value="<?= isset($product) ? $product['price'] : '' ?>"
                                        min="0" max="99999999" autocomplete="off"
+                                       required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label for="discounted_price" class="block text-sm font-medium text-gray-700">판매가격</label>
+                            <label for="discounted_price" class="block text-sm font-medium text-gray-700">판매가격 <span class="text-red-500">*</span></label>
                             <div class="price_format" data-format="원">
                                 <input type="number" id="discounted_price" name="discounted_price"
                                        value="<?= isset($product) ? $product['discounted_price'] : '' ?>"
                                        min="0" max="99999999" autocomplete="off"
+                                       required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                             </div>
                         </div>
                         <div class="space-y-2 space-x-2">
-                            <label for="discount_format" class="block text-sm font-medium text-gray-700">할인 표기법</label>
+                            <label for="discount_format" class="block text-sm font-medium text-gray-700">할인 표기법 <span class="text-red-500">*</span></label>
                             <label>
                                 –
                                 <input type="radio" name="discount_format" value="-"

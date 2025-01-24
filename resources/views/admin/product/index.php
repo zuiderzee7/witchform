@@ -16,8 +16,8 @@
             <ul class="w-full divide-y divide-gray-200">
                 <!-- 헤더 -->
                 <li class="grid grid-cols-7 gap-4 p-4 bg-gray-100 font-medium text-sm sticky top-0">
+                    <div class="col-span-1">업체명</div>
                     <div class="col-span-1">상품명</div>
-                    <div class="col-span-1">회사명</div>
                     <div class="text-right">가격</div>
                     <div class="text-right">할인가격</div>
                     <div class="text-center">할인형식</div>
@@ -28,11 +28,11 @@
                 <?php if (!empty($products)): ?>
                     <?php foreach ($products as $product): ?>
                         <li class="grid grid-cols-7 gap-4 p-4 transition-colors hover:bg-gray-50">
-                            <div class="col-span-1 truncate" title="<?= htmlspecialchars($product['name']) ?>">
-                                <?= htmlspecialchars($product['name']) ?>
-                            </div>
                             <div class="col-span-1 truncate" title="<?= htmlspecialchars($product['company_name']) ?>">
                                 <?= htmlspecialchars($product['company_name']) ?>
+                            </div>
+                            <div class="col-span-1 truncate" title="<?= htmlspecialchars($product['name']) ?>">
+                                <?= htmlspecialchars($product['name']) ?>
                             </div>
                             <div class="text-right font-medium">
                                 <?= number_format($product['price']) ?>원
@@ -49,7 +49,7 @@
                             <div class="text-center text-sm text-gray-600">
                                 <?= (new DateTime($product['created_dt']))->format('Y-m-d') ?>
                             </div>
-                            <div class="text-center">
+                            <div class="text-center space-x-px">
                                 <button onclick="editProduct(<?= $product['id'] ?>)"
                                         class="px-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                                     수정
