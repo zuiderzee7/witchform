@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT']. '/../src/bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../src/bootstrap.php';
 use Database\Connection;
 
 try {
@@ -10,31 +10,29 @@ try {
     $limit = 5;
     $offset = ($page - 1) * $limit;
 
-    // 전체 업체 수 조회
-    $countStmt = $db->query("SELECT COUNT(*) FROM companies");
+    // 전체 게시글 수 조회
+    $countStmt = $db->query("SELECT COUNT(*) FROM posts");
     $total_records = $countStmt->fetchColumn();
     $total_pages = ceil($total_records / $limit);
 
-    // 업체 데이터 조회
+    // 게시글 목록 조회
     $stmt = $db->prepare("
-        SELECT * FROM companies 
-        ORDER BY created_dt DESC
+        SELECT p.*, c.name AS company_name
+        FROM posts p
+        LEFT JOIN companies c ON p.company_id = c.id
+        ORDER BY p.created_dt DESC
         LIMIT :limit OFFSET :offset
     ");
-
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
-    $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $dir = trim(dirname($_SERVER['SCRIPT_NAME']), '/');
-    $file = basename($_SERVER['SCRIPT_NAME'], '.php');
-    $viewPath = $dir ? $dir . '/' . $file : $file;
+    $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    view($viewPath, [
-        'title' => '관리자 업체 관리',
-        'dir'=> '/' . $dir,
-        'companies' => $companies,
+    // 뷰 렌더
+    view('admin/post/index', [
+        'title' => '게시글 관리',
+        'posts' => $posts,
         'current_page' => $page,
         'total_pages' => $total_pages
     ], '/admin');

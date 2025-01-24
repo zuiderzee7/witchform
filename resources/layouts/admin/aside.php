@@ -42,7 +42,7 @@
         </li>
 
         <li class="group relative hover:bg-gray-50 rounded-md transition-colors duration-200">
-            <a href="/admin/product" class="block px-4 py-2 pr-2 text-gray-700 hover:text-blue-600 flex items-center justify-between">
+            <a href="/admin/post" class="block px-4 py-2 pr-2 text-gray-700 hover:text-blue-600 flex items-center justify-between">
                 게시물 리스트
                 <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
