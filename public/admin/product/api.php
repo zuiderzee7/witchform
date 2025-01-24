@@ -5,10 +5,14 @@ use Database\Connection;
 try {
     $db = Connection::getInstance()->getConnection();
 
-    // HTTP 메소드 확인
-    $method = $_SERVER['REQUEST_METHOD'];
+    // HTTP 메소드 확인 (POST의 _method 필드 처리)
+    $method = $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
 
     switch ($method) {
+        case 'GET':
+            handleGet($db);
+            break;
+
         case 'POST':
             handlePost($db);
             break;
@@ -31,9 +35,38 @@ try {
     exit;
 }
 
+
+function handleGet($db) {
+    $id = $_GET['id'] ?? null;
+
+    if (!$id) {
+        throw new Exception('상품 ID가 필요합니다.');
+    }
+
+    $sql = "
+        SELECT p.*, c.name as company_name 
+        FROM products p 
+        LEFT JOIN companies c ON p.company_id = c.id 
+        WHERE p.id = :id
+    ";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute(['id' => $id]);
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$product) {
+        throw new Exception('존재하지 않는 상품입니다.');
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($product);
+    exit;
+}
+
+
 function handlePost($db) {
     // 필수 필드 검증
-    validateFields(['name', 'price', 'discounted_price']);
+    validateFields(['company_id', 'name', 'price', 'discounted_price']);
 
     $sql = "INSERT INTO products (company_id, name, price, discounted_price, discount_format) 
             VALUES (:company_id, :name, :price, :discounted_price, :discount_format)";
@@ -87,24 +120,38 @@ function handlePut($db) {
     }
 }
 
+/**
+ * @throws Exception
+ */
 function handleDelete($db) {
-    // DELETE 요청의 데이터 파싱
-    parse_str(file_get_contents("php://input"), $_DELETE);
+    $id = $_POST['id'] ?? null;
 
-    if (!isset($_DELETE['id'])) {
+    if (!isset($id)) {
         throw new Exception('삭제할 상품 ID가 필요합니다.');
+    }
+
+    // 상품 존재 여부 확인
+    $checkStmt = $db->prepare("SELECT id FROM products WHERE id = ?");
+    $checkStmt->execute([$id]);
+    if (!$checkStmt->fetch()) {
+        throw new Exception('존재하지 않는 상품입니다.');
     }
 
     $sql = "DELETE FROM products WHERE id = :id";
     $stmt = $db->prepare($sql);
-    $result = $stmt->execute(['id' => $_DELETE['id']]);
+    $result = $stmt->execute(['id' => $id]);
 
     if ($result) {
         header('Location: /admin/product?success=delete');
         exit;
     }
+
+    throw new Exception('상품 삭제에 실패했습니다.');
 }
 
+/**
+ * @throws Exception
+ */
 function validateFields($required_fields, $data = null): bool
 {
     $data = $data ?? $_POST;

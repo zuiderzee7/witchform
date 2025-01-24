@@ -1,6 +1,6 @@
 <nav class="mt-2 p-4 h-fit bg-white shadow-lg rounded-lg border-t border-solid border-gray-100" role="navigation">
     <ul class="space-y-2">
-        <li class="text-lg font-bold px-4 py-2 bg-gray-100 rounded-md text-gray-800">메뉴</li>
+        <li class="text-lg font-bold px-3 py-1 bg-gray-100 rounded-md text-gray-800">메뉴</li>
 
         <li class="group relative hover:bg-gray-50 rounded-md transition-colors duration-200">
             <a href="/admin/product" class="block px-4 py-2 pr-2 text-gray-700 hover:text-blue-600 flex items-center justify-between">
