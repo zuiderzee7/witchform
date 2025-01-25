@@ -35,7 +35,6 @@ $csrf_token = $_SESSION['csrf_token'];
                 <?php endif; ?>
 
                 <ul class="w-full divide-y divide-gray-200">
-                    <!-- 업체명 -->
                     <li class="grid gap-4 py-4">
                         <div class="space-y-2">
                             <label for="name" class="block text-sm font-medium text-gray-700">
@@ -49,7 +48,6 @@ $csrf_token = $_SESSION['csrf_token'];
                         </div>
                     </li>
 
-                    <!-- 이메일, 연락처 -->
                     <li class="grid grid-cols-2 gap-4 py-4">
                         <div class="space-y-2">
                             <label for="email" class="block text-sm font-medium text-gray-700">
@@ -74,7 +72,6 @@ $csrf_token = $_SESSION['csrf_token'];
                         </div>
                     </li>
 
-                    <!-- 우편번호, 주소 -->
                     <li class="grid gap-4 py-4">
                         <div class="space-y-2">
                             <label for="postal_code" class="block text-sm font-medium text-gray-700">우편번호</label>
@@ -103,7 +100,6 @@ $csrf_token = $_SESSION['csrf_token'];
                         </li>
                     <?php endif; ?>
 
-                    <!-- 버튼 -->
                     <li class="py-4 flex justify-end space-x-2">
                         <button type="submit"
                                 class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">

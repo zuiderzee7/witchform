@@ -57,8 +57,24 @@ function handleGet($db) {
         throw new Exception('존재하지 않는 업체입니다.');
     }
 
+    // 해당 회사의 제품 목록 조회
+    $productStmt = $db->prepare("
+        SELECT id, name, price, discounted_price, discount_format 
+        FROM products 
+        WHERE company_id = :company_id 
+        ORDER BY id DESC
+    ");
+    $productStmt->execute(['company_id' => $id]);
+    $products = $productStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 회사 정보와 제품 목록을 함께 반환
+    $result = [
+        'company' => $company,
+        'products' => $products
+    ];
+
     header('Content-Type: application/json');
-    echo json_encode($company);
+    echo json_encode($result);
     exit;
 }
 

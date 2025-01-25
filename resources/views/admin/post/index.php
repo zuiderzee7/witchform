@@ -18,23 +18,19 @@
             <!-- 게시글 리스트 (UL 기반) -->
             <ul class="w-full divide-y divide-gray-200">
                 <!-- 헤더 -->
-                <li class="grid grid-cols-5 gap-4 p-4 bg-gray-100 font-medium text-sm sticky top-0">
+                <li class="grid grid-cols-3 gap-4 p-4 bg-gray-100 font-medium text-sm sticky top-0">
                     <div>ID</div>
                     <div>제목</div>
-                    <div>등록일</div>
-                    <div class="text-center">배송설정</div>
                     <div class="text-center">관리</div>
                 </li>
 
                 <?php if(!empty($posts)): ?>
                     <?php foreach($posts as $post): ?>
-                        <li class="grid grid-cols-5 gap-4 p-4 transition-colors hover:bg-gray-50">
-                            <!-- ID -->
+                        <li class="grid grid-cols-3 gap-4 p-4 transition-colors hover:bg-gray-50">
                             <div>
                                 <?= (int) $post['id'] ?>
                             </div>
 
-                            <!-- 제목 -->
                             <div class="truncate">
                                 <a href="/admin/post/form?id=<?= (int) $post['id'] ?>"
                                    class="text-blue-500 hover:underline whitespace-nowrap"
@@ -43,20 +39,6 @@
                                 </a>
                             </div>
 
-                            <!-- 등록일 -->
-                            <div>
-                                <?= htmlspecialchars($post['created_dt']) ?>
-                            </div>
-
-                            <!-- 배송설정 -->
-                            <div class="text-center">
-                                <a href="/admin/post/delivery?post_id=<?= (int) $post['id'] ?>"
-                                   class="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-                                    배송설정
-                                </a>
-                            </div>
-
-                            <!-- 관리 (수정 / 삭제) -->
                             <div class="text-center space-x-1">
                                 <button type="button"
                                         onclick="editPost(<?= (int) $post['id'] ?>)"
