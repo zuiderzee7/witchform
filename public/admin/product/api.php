@@ -80,24 +80,53 @@ function handleGet($db) {
  * 상품 생성 (POST)
  */
 function handlePost($db) {
-    // 필수 필드 검증
-    validateFields(['company_id', 'name', 'price', 'discounted_price']);
+    try {
+        validateFields(['company_id', 'name', 'price', 'discounted_price']);
 
-    $sql = "INSERT INTO products (company_id, name, price, discounted_price, discount_format) 
-            VALUES (:company_id, :name, :price, :discounted_price, :discount_format)";
+        $db->beginTransaction();
 
-    $stmt = $db->prepare($sql);
-    $result = $stmt->execute([
-        'company_id' => $_POST['company_id'],
-        'name' => $_POST['name'],
-        'price' => $_POST['price'],
-        'discounted_price' => $_POST['discounted_price'],
-        'discount_format' => $_POST['discount_format']
-    ]);
+        // 1. products 테이블 저장
+        $stmt = $db->prepare("
+            INSERT INTO products (
+                company_id, name, price, discounted_price, discount_format
+            ) VALUES (
+                :company_id, :name, :price, :discounted_price, :discount_format
+            )
+        ");
 
-    if ($result) {
+        $stmt->execute([
+            'company_id' => $_POST['company_id'],
+            'name' => $_POST['name'],
+            'price' => $_POST['price'],
+            'discounted_price' => $_POST['discounted_price'],
+            'discount_format' => $_POST['discount_format']
+        ]);
+
+        $product_id = $db->lastInsertId();
+
+        // 2. product_inventories 테이블 저장
+        $stmt = $db->prepare("
+            INSERT INTO product_inventories (
+                product_id, company_id, total_inventory, current_inventory
+            ) VALUES (
+                :product_id, :company_id, :total_inventory, :current_inventory
+            )
+        ");
+
+        $stmt->execute([
+            'product_id' => $product_id,
+            'company_id' => $_POST['company_id'],
+            'total_inventory' => !empty($_POST['total_inventory']) ? (int)$_POST['total_inventory'] : 0,
+            'current_inventory' => !empty($_POST['current_inventory']) ? (int)$_POST['current_inventory'] : 0
+        ]);
+
+        $db->commit();
         header('Location: /admin/product');
         exit;
+
+    } catch (Exception $e) {
+        $db->rollBack();
+        throw $e;
     }
 }
 
@@ -105,34 +134,59 @@ function handlePost($db) {
  * 상품 수정 (PUT)
  */
 function handlePut($db, $_PUT) {
-    // ID 확인
-    if (!isset($_PUT['id'])) {
-        throw new Exception('상품 ID가 필요합니다.');
-    }
+    try {
+        if (!isset($_PUT['id'])) {
+            throw new Exception('상품 ID가 필요합니다.');
+        }
 
-    validateFields(['name', 'price', 'discounted_price'], $_PUT);
+        validateFields(['name', 'price', 'discounted_price'], $_PUT);
 
-    $sql = "UPDATE products 
-            SET name = :name, 
-                price = :price, 
+        $db->beginTransaction();
+
+        // 1. products 테이블 수정
+        $stmt = $db->prepare("
+            UPDATE products 
+            SET name = :name,
+                price = :price,
                 discounted_price = :discounted_price,
                 discount_format = :discount_format,
                 updated_dt = NOW()
-            WHERE id = :id";
+            WHERE id = :id
+        ");
 
-    $stmt = $db->prepare($sql);
-    $result = $stmt->execute([
-        'id' => $_PUT['id'],
-        'name' => $_PUT['name'],
-        'price' => $_PUT['price'],
-        'discounted_price' => $_PUT['discounted_price'],
-        // 주의: PUT에서는 $_POST가 아닌 $_PUT에서 받아와야 합니다.
-        'discount_format' => $_PUT['discount_format'] ?? null
-    ]);
+        $stmt->execute([
+            'id' => $_PUT['id'],
+            'name' => $_PUT['name'],
+            'price' => $_PUT['price'],
+            'discounted_price' => $_PUT['discounted_price'],
+            'discount_format' => $_PUT['discount_format'] ?? null
+        ]);
 
-    if ($result) {
+        // 2. product_inventories 테이블 UPSERT
+        $stmt = $db->prepare("
+            INSERT INTO product_inventories (
+                product_id, company_id, total_inventory, current_inventory
+            ) VALUES (
+                :product_id, :company_id, :total_inventory, :current_inventory
+            ) ON DUPLICATE KEY UPDATE
+                total_inventory = VALUES(total_inventory),
+                current_inventory = VALUES(current_inventory)
+        ");
+
+        $stmt->execute([
+            'product_id' => $_PUT['id'],
+            'company_id' => $_PUT['company_id'],
+            'total_inventory' => !empty($_PUT['total_inventory']) ? (int)$_PUT['total_inventory'] : 0,
+            'current_inventory' => !empty($_PUT['current_inventory']) ? (int)$_PUT['current_inventory'] : 0
+        ]);
+
+        $db->commit();
         header('Location: /admin/product');
         exit;
+
+    } catch (Exception $e) {
+        $db->rollBack();
+        throw $e;
     }
 }
 

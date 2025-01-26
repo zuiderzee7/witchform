@@ -4,15 +4,15 @@ use Database\Connection;
 
 try {
     $db = Connection::getInstance()->getConnection();
-    $company = null;
+    $data = null;
 
     // ID가 있는 경우 업체 정보 조회
     if (isset($_GET['id'])) {
         $stmt = $db->prepare("SELECT * FROM companies WHERE id = :id");
         $stmt->execute(['id' => $_GET['id']]);
-        $company = $stmt->fetch(PDO::FETCH_ASSOC);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$company) {
+        if (!$data) {
             throw new Exception('존재하지 않는 업체입니다.');
         }
     }
@@ -22,9 +22,9 @@ try {
     $viewPath = $dir ? $dir . '/' . $file : $file;
 
     view($viewPath, [
-        'title' => isset($company) ? '업체 수정' : '업체 등록',
+        'title' => isset($data) ? '업체 수정' : '업체 등록',
         'dir'=> '/' . $dir,
-        'company' => $company
+        'data' => $data
     ], '/admin');
 
 } catch (Exception $e) {

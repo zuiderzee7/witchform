@@ -67,8 +67,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                    value="<?= isset($post) ? htmlspecialchars($post['title']) : '' ?>"
                                    required
                                    autocomplete="off"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-                                          focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </li>
 
@@ -91,38 +90,40 @@ $csrf_token = $_SESSION['csrf_token'];
                                     <label for="pickup_cost" class="block text-sm text-gray-600">픽업 비용</label>
                                     <div class="price_format" data-format="원">
                                         <input type="number"
-                                               id="pickup_cost"
-                                               name="pickup_cost"
-                                               value="<?= isset($post_delivery) ? (int)$post_delivery['pickup_cost'] : '' ?>"
-                                               min="0"
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                               placeholder="미입력 픽업 불가 or 0원 무료">
+                                           id="pickup_cost"
+                                           name="pickup_cost"
+                                           value="<?= isset($post_delivery) ? $post_delivery['pickup_cost'] : '' ?>"
+                                           min="0"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="미입력 픽업 불가 or 0원 무료">
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label for="delivery_cost" class="block text-sm text-gray-600">기본 배송비</label>
+                                    <label for="delivery_cost" class="block text-sm text-gray-600">기본 배송비 <span class="text-red-500">*</span></label>
                                     <div class="price_format" data-format="원">
                                         <input type="number"
-                                                   id="delivery_cost"
-                                                   name="delivery_cost"
-                                                   value="<?= isset($post_delivery) ? (int)$post_delivery['delivery_cost'] : 3500 ?>"
-                                                   min="0"
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                                   placeholder="3500">
+                                           id="delivery_cost"
+                                           name="delivery_cost"
+                                           value="<?= isset($post_delivery) ? $post_delivery['delivery_cost'] : 3500 ?>"
+                                           min="0"
+                                           required
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="3500">
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label for="free_delivery_amount" class="block text-sm text-gray-600">무료배송 기준금액</label>
+                                <label for="free_delivery_amount" class="block text-sm text-gray-600">무료배송 기준금액 <span class="text-red-500">*</span></label>
                                 <div class="price_format" data-format="원">
                                     <input type="number"
-                                               id="free_delivery_amount"
-                                               name="free_delivery_amount"
-                                               value="<?= isset($post_delivery) ? (int)$post_delivery['free_delivery_amount'] : '' ?>"
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                               placeholder="50000">
+                                       id="free_delivery_amount"
+                                       name="free_delivery_amount"
+                                       value="<?= isset($post_delivery) ? $post_delivery['free_delivery_amount'] : '' ?>"
+                                       required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                       placeholder="50000">
                                 </div>
                             </div>
                         </div>
@@ -153,7 +154,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                 관련 상품 <span class="text-red-500">*</span>
                             </label>
                             <div id="products-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                <!-- 상품 목록이 여기에 동적 로드 -->
+                                업체를 선택해주세요.
                             </div>
                         </div>
                     </li>
@@ -229,7 +230,7 @@ $csrf_token = $_SESSION['csrf_token'];
         let hasError = false;
 
         // 일반 필수 필드 검사
-        const requiredFields = ['title', 'company_id'];
+        const requiredFields = ['title', 'company_id', 'delivery_cost', 'free_delivery_amount'];
         requiredFields.forEach(fieldId => {
             const input = document.getElementById(fieldId);
             if (!input.value.trim()) {
