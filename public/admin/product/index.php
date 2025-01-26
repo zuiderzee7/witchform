@@ -7,7 +7,7 @@ try {
 
     // 페이지네이션 설정
     $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-    $limit = 2; // 페이지당 표시할 항목 수
+    $limit = 5;// 페이지당 표시할 항목 수
     $offset = ($page - 1) * $limit;
 
     // 전체 상품 수 조회
@@ -17,9 +17,11 @@ try {
 
     // 상품 데이터 조회 (페이지네이션 적용)
     $stmt = $db->prepare("
-        SELECT p.*, c.name as company_name 
+        SELECT p.*, c.name as company_name,
+               pi.total_inventory, pi.current_inventory
         FROM products p 
-        LEFT JOIN companies c ON p.company_id = c.id 
+        LEFT JOIN companies c ON p.company_id = c.id
+        LEFT JOIN product_inventories pi ON p.id = pi.product_id
         ORDER BY p.created_dt DESC
         LIMIT :limit OFFSET :offset
     ");
@@ -27,7 +29,7 @@ try {
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
-    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $dir = trim(dirname($_SERVER['SCRIPT_NAME']), '/');
     $file = basename($_SERVER['SCRIPT_NAME'], '.php');
@@ -36,7 +38,7 @@ try {
     view($viewPath, [
         'title' => '관리자 상품 관리',
         'dir'=> '/' . $dir,
-        'products' => $products ?? [],
+        'data' => $data ?? [],
         'current_page' => $page,
         'total_pages' => $total_pages
     ], '/admin');

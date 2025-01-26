@@ -14,7 +14,6 @@
             </div>
 
             <ul class="w-full divide-y divide-gray-200">
-                <!-- 헤더 -->
                 <li class="grid grid-cols-6 gap-4 p-4 bg-gray-100 font-medium text-sm sticky top-0">
                     <div class="col-span-1">업체명</div>
                     <div class="col-span-1">이메일</div>

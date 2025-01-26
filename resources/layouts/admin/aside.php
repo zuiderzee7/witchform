@@ -52,9 +52,6 @@
                 <li class="hover:bg-gray-50">
                     <a href="/admin/post/form" class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600">게시물 추가</a>
                 </li>
-                <li class="hover:bg-gray-50">
-                    <a href="/admin/post/delivery" class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600">배송 설정</a>
-                </li>
             </ul>
         </li>
     </ul>

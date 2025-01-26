@@ -16,7 +16,7 @@ $csrf_token = $_SESSION['csrf_token'];
         <?php include BASE_PATH . "/resources/layouts/admin/aside.php"; ?>
         <section class="flex-1">
             <div class="flex justify-between py-2">
-                <h1 class="text-lg font-bold"><?= isset($company) ? '업체 수정' : '업체 추가' ?></h1>
+                <h1 class="text-lg font-bold"><?= isset($data) ? '업체 수정' : '업체 추가' ?></h1>
                 <div>
                     <a href="/admin/company"
                        class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center">
@@ -29,9 +29,9 @@ $csrf_token = $_SESSION['csrf_token'];
                 <!-- CSRF 토큰 전송 -->
                 <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
 
-                <?php if(isset($company)): ?>
+                <?php if(isset($data)): ?>
                     <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="id" value="<?= $company['id'] ?>">
+                    <input type="hidden" name="id" value="<?= $data['id'] ?>">
                 <?php endif; ?>
 
                 <ul class="w-full divide-y divide-gray-200">
@@ -41,7 +41,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                 업체명 <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="name" name="name"
-                                   value="<?= isset($company) ? htmlspecialchars($company['name']) : '' ?>"
+                                   value="<?= isset($data) ? htmlspecialchars($data['name']) : '' ?>"
                                    required
                                    autocomplete="off"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -54,7 +54,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                 이메일 <span class="text-red-500">*</span>
                             </label>
                             <input type="email" id="email" name="email"
-                                   value="<?= isset($company) ? htmlspecialchars($company['email']) : '' ?>"
+                                   value="<?= isset($data) ? htmlspecialchars($data['email']) : '' ?>"
                                    required
                                    autocomplete="off"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -64,7 +64,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                 연락처 <span class="text-red-500">*</span>
                             </label>
                             <input type="tel" id="contact" name="contact"
-                                   value="<?= isset($company) ? htmlspecialchars($company['contact']) : '' ?>"
+                                   value="<?= isset($data) ? htmlspecialchars($data['contact']) : '' ?>"
                                    required
                                    autocomplete="off"
                                    placeholder="예: 010-1234-5678"
@@ -76,7 +76,7 @@ $csrf_token = $_SESSION['csrf_token'];
                         <div class="space-y-2">
                             <label for="postal_code" class="block text-sm font-medium text-gray-700">우편번호</label>
                             <input type="text" id="postal_code" name="postal_code"
-                                   value="<?= isset($company) ? htmlspecialchars($company['postal_code']) : '' ?>"
+                                   value="<?= isset($data) ? htmlspecialchars($data['postal_code']) : '' ?>"
                                    autocomplete="off"
                                    maxlength="7"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -86,7 +86,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                 주소 <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="address" name="address"
-                                   value="<?= isset($company) ? htmlspecialchars($company['address']) : '' ?>"
+                                   value="<?= isset($data) ? htmlspecialchars($data['address']) : '' ?>"
                                    required
                                    autocomplete="off"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -103,7 +103,7 @@ $csrf_token = $_SESSION['csrf_token'];
                     <li class="py-4 flex justify-end space-x-2">
                         <button type="submit"
                                 class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            <?= isset($company) ? '수정' : '추가' ?>
+                            <?= isset($data) ? '수정' : '추가' ?>
                         </button>
                     </li>
                 </ul>

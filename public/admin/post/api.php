@@ -69,7 +69,7 @@ function handlePost($db) {
             $stmt->execute([
                 'company_id'           => $_POST['company_id'],
                 'post_id'              => $post_id,
-                'pickup_cost'          => $_POST['pickup_cost']          ?? null,
+                'pickup_cost'          => $_POST['pickup_cost'] ?? null,
                 'delivery_cost'        => $_POST['delivery_cost'],
                 'free_delivery_amount' => $_POST['free_delivery_amount'] ?? null,
             ]);
@@ -146,9 +146,9 @@ function handlePut($db, $_PUT) {
             $stmt->execute([
                 'company_id' => $_PUT['company_id'],
                 'post_id' => $_PUT['id'],
-                'pickup_cost' => $_PUT['pickup_cost'] ?? null,
+                'pickup_cost' => !empty($_PUT['pickup_cost']) ? (int)$_PUT['pickup_cost'] : null,
                 'delivery_cost' => $_PUT['delivery_cost'],
-                'free_delivery_amount' => $_PUT['free_delivery_amount'] ?? null
+                'free_delivery_amount' => !empty($_PUT['free_delivery_amount']) ? (int)$_PUT['free_delivery_amount'] : 0
             ]);
         }
 

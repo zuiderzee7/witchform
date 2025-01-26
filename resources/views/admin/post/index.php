@@ -15,18 +15,17 @@
                 </div>
             </div>
 
-            <!-- 게시글 리스트 (UL 기반) -->
             <ul class="w-full divide-y divide-gray-200">
-                <!-- 헤더 -->
-                <li class="grid grid-cols-3 gap-4 p-4 bg-gray-100 font-medium text-sm sticky top-0">
+                <li class="grid grid-cols-4 gap-4 p-4 bg-gray-100 font-medium text-sm sticky top-0">
                     <div>ID</div>
                     <div>제목</div>
+                    <div>상세설명</div>
                     <div class="text-center">관리</div>
                 </li>
 
                 <?php if(!empty($posts)): ?>
                     <?php foreach($posts as $post): ?>
-                        <li class="grid grid-cols-3 gap-4 p-4 transition-colors hover:bg-gray-50">
+                        <li class="grid grid-cols-4 gap-4 p-4 transition-colors hover:bg-gray-50">
                             <div>
                                 <?= (int) $post['id'] ?>
                             </div>
@@ -37,6 +36,9 @@
                                    title="<?= htmlspecialchars($post['title']) ?>">
                                     <?= htmlspecialchars($post['title']) ?>
                                 </a>
+                            </div>
+                            <div class="truncate">
+                                <?= htmlspecialchars($post['content']) ?>
                             </div>
 
                             <div class="text-center space-x-1">
@@ -60,7 +62,6 @@
                 <?php endif; ?>
             </ul>
 
-            <!-- 페이지네이션 -->
             <?php if ($total_pages > 1): ?>
                 <div class="flex justify-center gap-2 mt-4">
                     <?php if ($current_page > 1): ?>

@@ -39,7 +39,7 @@ $csrf_token = $_SESSION['csrf_token'];
         <?php include BASE_PATH . "/resources/layouts/admin/aside.php"; ?>
         <section class="flex-1">
             <div class="flex justify-between py-2">
-                <h1 class="text-lg font-bold"><?= isset($product) ? '상품 수정' : '상품 추가' ?></h1>
+                <h1 class="text-lg font-bold"><?= isset($data) ? '상품 수정' : '상품 추가' ?></h1>
                 <div>
                     <a href="/admin/product" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center">
                         목록
@@ -51,9 +51,9 @@ $csrf_token = $_SESSION['csrf_token'];
                 <!-- CSRF 토큰 전송 -->
                 <input type="hidden" name="_csrf_token" value="<?= $csrf_token ?>">
 
-                <?php if(isset($product)): ?>
+                <?php if(isset($data)): ?>
                     <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="id" value="<?= $product['id'] ?>">
+                    <input type="hidden" name="id" value="<?= $data['id'] ?>">
                 <?php endif; ?>
 
                 <ul class="w-full divide-y divide-gray-200">
@@ -67,7 +67,7 @@ $csrf_token = $_SESSION['csrf_token'];
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">선택하세요</option>
                                 <?php foreach ($companies as $company): ?>
-                                    <option value="<?= $company['id'] ?>" <?= isset($product) && $product['company_id'] == $company['id'] ? 'selected' : '' ?>>
+                                    <option value="<?= $company['id'] ?>" <?= isset($data) && $data['company_id'] == $company['id'] ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($company['name']) ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -79,7 +79,7 @@ $csrf_token = $_SESSION['csrf_token'];
                         <div class="space-y-2">
                             <label for="name" class="block text-sm font-medium text-gray-700">상품명 <span class="text-red-500">*</span></label>
                             <input type="text" id="name" name="name"
-                                   value="<?= isset($product) ? htmlspecialchars($product['name']) : '' ?>"
+                                   value="<?= isset($data) ? htmlspecialchars($data['name']) : '' ?>"
                                    autocomplete="off"
                                    required
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -91,7 +91,7 @@ $csrf_token = $_SESSION['csrf_token'];
                             <label for="price" class="block text-sm font-medium text-gray-700">가격 <span class="text-red-500">*</span></label>
                             <div class="price_format" data-format="원">
                                 <input type="number" id="price" name="price"
-                                       value="<?= isset($product) ? $product['price'] : '' ?>"
+                                       value="<?= isset($data) ? $data['price'] : '' ?>"
                                        min="0" max="99999999" autocomplete="off"
                                        required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -101,7 +101,7 @@ $csrf_token = $_SESSION['csrf_token'];
                             <label for="discounted_price" class="block text-sm font-medium text-gray-700">판매가격 <span class="text-red-500">*</span></label>
                             <div class="price_format" data-format="원">
                                 <input type="number" id="discounted_price" name="discounted_price"
-                                       value="<?= isset($product) ? $product['discounted_price'] : '' ?>"
+                                       value="<?= isset($data) ? $data['discounted_price'] : '' ?>"
                                        min="0" max="99999999" autocomplete="off"
                                        required
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -112,17 +112,43 @@ $csrf_token = $_SESSION['csrf_token'];
                             <label>
                                 –
                                 <input type="radio" name="discount_format" value="-"
-                                    <?= !isset($product) || $product['discount_format'] == '-' ? 'checked' : '' ?>>
+                                    <?= !isset($data) || $data['discount_format'] == '-' ? 'checked' : '' ?>>
                             </label>
                             <label>
                                 %
                                 <input type="radio" name="discount_format" value="%"
-                                    <?= isset($product) && $product['discount_format'] == '%' ? 'checked' : '' ?>>
+                                    <?= isset($data) && $data['discount_format'] == '%' ? 'checked' : '' ?>>
                             </label>
                         </div>
                         <div class="space-y-2 text-right">
                             <label class="block text-sm font-medium text-gray-700">할인 표기</label>
                             <span id="discount_price" class="price_format w-fit text-lg text-red-700" data-format="원">0</span>
+                        </div>
+                    </li>
+
+                    <li class="grid gap-4 py-4">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">재고 관리</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="total_inventory" class="block text-sm text-gray-600">총 재고수량</label>
+                                    <input type="number"
+                                           id="total_inventory"
+                                           name="total_inventory"
+                                           value="<?= isset($data['total_inventory']) ? (int)$data['total_inventory'] : 0 ?>"
+                                           min="0"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="current_inventory" class="block text-sm text-gray-600">현재 재고수량</label>
+                                    <input type="number"
+                                           id="current_inventory"
+                                           name="current_inventory"
+                                           value="<?= isset($data['current_inventory']) ? (int)$data['current_inventory'] : 0 ?>"
+                                           min="0"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
                         </div>
                     </li>
 
@@ -135,7 +161,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
                     <li class="py-4 flex justify-end space-x-2">
                         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-6 rounded-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            <?= isset($product) ? '수정' : '추가' ?>
+                            <?= isset($data) ? '수정' : '추가' ?>
                         </button>
                     </li>
                 </ul>
