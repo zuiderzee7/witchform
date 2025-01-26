@@ -33,8 +33,6 @@ try {
             break;
 
         case 'DELETE':
-            // CSRF 토큰 검증
-            handleCsrf($_POST['_csrf_token'] ?? '');
             handleDelete($db);
             break;
 

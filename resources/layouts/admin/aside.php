@@ -35,9 +35,6 @@
                 <li class="hover:bg-gray-50">
                     <a href="/admin/product/form" class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600">상품 추가</a>
                 </li>
-                <li class="hover:bg-gray-50">
-                    <a href="/admin/product/inventory" class="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600">재고 관리</a>
-                </li>
             </ul>
         </li>
 

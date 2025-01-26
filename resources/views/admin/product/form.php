@@ -185,7 +185,9 @@ $csrf_token = $_SESSION['csrf_token'];
             price: document.getElementById('price'),
             discountedPrice: document.getElementById('discounted_price'),
             discountPrice: document.getElementById('discount_price'),
-            formatRadios: document.getElementsByName('discount_format')
+            formatRadios: document.getElementsByName('discount_format'),
+            totalInventory: document.getElementById('total_inventory'),
+            currentInventory: document.getElementById('current_inventory')
         };
 
         // 표시 데이터
@@ -240,6 +242,8 @@ $csrf_token = $_SESSION['csrf_token'];
             const name = elements.name.value.trim();
             const price = Number(elements.price.value);
             const discountedPrice = Number(elements.discountedPrice.value);
+            const totalInventory = Number(elements.totalInventory.value);
+            const currentInventory = Number(elements.currentInventory.value);
 
             let isValid = true;
             const errors = {};
@@ -264,6 +268,12 @@ $csrf_token = $_SESSION['csrf_token'];
             }
             if (discountedPrice > price) {
                 errors.discountedPrice = '판매가격은 원래 가격보다 클 수 없습니다';
+                isValid = false;
+            }
+
+            // 재고 수량 검증
+            if (currentInventory > totalInventory) {
+                errors.currentInventory = '현재 재고는 총 재고수량을 초과할 수 없습니다';
                 isValid = false;
             }
 

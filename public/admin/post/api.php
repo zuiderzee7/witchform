@@ -23,7 +23,6 @@ try {
             break;
 
         case 'DELETE':
-            handleCsrf($_POST['_csrf_token'] ?? '');
             handleDelete($db);
             break;
 

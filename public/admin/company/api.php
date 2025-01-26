@@ -28,7 +28,6 @@ try {
             handlePut($db, $_PUT);
             break;
         case 'DELETE':
-            handleCsrf($_POST['_csrf_token'] ?? ''); // CSRF 체크
             handleDelete($db);
             break;
         default:
