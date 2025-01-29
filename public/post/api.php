@@ -105,32 +105,29 @@ try {
                 // 재고 수량 업데이트
                 $updateStmt = $db->prepare("
                     UPDATE product_inventories 
-                    SET current_inventory = current_inventory - :quantity
+                    SET current_inventory = current_inventory - :update_quantity
                     WHERE product_id = :product_id 
-                    AND company_id = :company_id          /* company_id 조건 추가 */
-                    AND current_inventory >= :quantity
+                    AND company_id = :company_id   
+                    AND current_inventory >= :check_quantity
                 ");
 
+                $quantity = (int)$item['quantity'];
                 $updateResult = $updateStmt->execute([
                     'product_id' => $item['product_id'],
-                    'company_id' => $_POST['company_id'], /* company_id 파라미터 추가 */
-                    'quantity' => $item['quantity']
+                    'company_id' => $_POST['company_id'],
+                    'update_quantity' => $quantity,
+                    'check_quantity' => $quantity
                 ]);
 
                 if (!$updateResult || $updateStmt->rowCount() === 0) {
                     throw new Exception('재고 수량이 부족하거나 업데이트에 실패했습니다.');
                 }
+
             }
 
             $db->commit();
 
-            // 성공 응답
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => true,
-                'order_number' => $orderNumber,
-                'redirect' => '/admin/post'
-            ]);
+            header('Location: /');
             exit;
 
         } catch (Exception $e) {
@@ -145,13 +142,7 @@ try {
 
 } catch (Exception $e) {
     error_log($e->getMessage());
-
-    header('Content-Type: application/json');
-    http_response_code(400);
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage() . ' line : '. $e->getLine()
-    ]);
+    header('Location: ?error=' . urlencode($e->getMessage()));
     exit;
 }
 

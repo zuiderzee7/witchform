@@ -1,12 +1,18 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT']. '/../src/bootstrap.php';
 use Database\Connection;
+use Payments\Toss;
 
 try {
     $db = Connection::getInstance()->getConnection();
-
+    $toss = Toss::getInstance();
     $limit = 5; // 페이지당 표시할 항목 수
-
+    $statusMap = [
+        'pending' => ['label' => '주문접수', 'class' => 'bg-yellow-100 text-yellow-800'],
+        'paid' => ['label' => '결제완료', 'class' => 'bg-blue-100 text-blue-800'],
+        'cancelled' => ['label' => '주문취소', 'class' => 'bg-red-100 text-red-800'],
+        'completed' => ['label' => '배송완료', 'class' => 'bg-green-100 text-green-800']
+    ];
     // 게시물 데이터 조회
     $postStmt = $db->prepare("
         SELECT p.*, c.name as company_name 
@@ -33,7 +39,7 @@ try {
 
     // 결제 데이터 조회
     $paymentStmt = $db->prepare("
-        SELECT p.*, o.order_number 
+        SELECT p.*, o.* 
         FROM payments p 
         LEFT JOIN orders o ON p.order_id = o.id 
         ORDER BY p.created_dt DESC
@@ -52,8 +58,10 @@ try {
         'dir'=> '/'.$dir,
         'posts' => $posts,
         'orders' => $orders,
+        'statusMap'=>$statusMap,
         'payments' => $payments,
-    ], '/admin');
+        'toss'=>$toss
+    ], '/');
 
 } catch (Exception $e) {
     error_log($e->getMessage());
