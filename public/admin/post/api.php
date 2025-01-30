@@ -35,6 +35,8 @@ try {
 
 /**
  * 게시글 생성 (POST)
+ * @param $db
+ * @throws Exception
  */
 function handlePost($db) {
     try {
@@ -101,6 +103,9 @@ function handlePost($db) {
 
 /**
  * 게시글 수정 (PUT)
+ * @param $db
+ * @param $_PUT
+ * @throws Exception
  */
 function handlePut($db, $_PUT) {
     try {
@@ -165,19 +170,19 @@ function handlePut($db, $_PUT) {
             $productsToDelete = array_diff($existingProducts, $newProducts);
             if (!empty($productsToDelete)) {
                 $stmt = $db->prepare("
-            DELETE FROM post_products 
-            WHERE post_id = :post_id AND product_id IN (" . implode(',', $productsToDelete) . ")
-        ");
+                    DELETE FROM post_products 
+                    WHERE post_id = :post_id AND product_id IN (" . implode(',', $productsToDelete) . ")
+                ");
                 $stmt->execute(['post_id' => $_PUT['id']]);
             }
 
-            // 추가할 상품 (새로운 목록에 있지만 기존에 없던 것)
+            // 추가할 상품
             $productsToAdd = array_diff($newProducts, $existingProducts);
             if (!empty($productsToAdd)) {
                 $stmt = $db->prepare("
-            INSERT INTO post_products (company_id, post_id, product_id)
-            VALUES (:company_id, :post_id, :product_id)
-        ");
+                    INSERT INTO post_products (company_id, post_id, product_id)
+                    VALUES (:company_id, :post_id, :product_id)
+                ");
                 foreach ($productsToAdd as $product_id) {
                     $stmt->execute([
                         'company_id' => $_PUT['company_id'],
@@ -201,6 +206,8 @@ function handlePut($db, $_PUT) {
 
 /**
  * 게시글 삭제 (DELETE)
+ * @param $db
+ * @throws Exception
  */
 function handleDelete($db) {
     try {
@@ -234,6 +241,10 @@ function handleDelete($db) {
 
 /**
  * 필수 필드 검증 함수
+ * @param $required_fields
+ * @param null $data
+ * @return true
+ * @throws Exception
  */
 function validateFields($required_fields, $data = null) {
     $data = $data ?? $_POST;
@@ -254,6 +265,8 @@ function validateFields($required_fields, $data = null) {
 
 /**
  * CSRF 토큰 검사 함수
+ * @param $token
+ * @throws Exception
  */
 function handleCsrf($token) {
     if (empty($token) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
@@ -263,6 +276,7 @@ function handleCsrf($token) {
 
 /**
  * 에러 핸들링 함수
+ * @param $e
  */
 function handleError($e) {
     error_log($e->getMessage());

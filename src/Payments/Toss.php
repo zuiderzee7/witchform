@@ -16,13 +16,14 @@ class Toss
         $dotenv = Dotenv::createImmutable(BASE_PATH . '/');
         $dotenv->safeLoad();
 
-        $config = require BASE_PATH . '/config/toss.php';
-
-        $this->apiKey = $config['TOSS_SECRET_KEY'];
-        $this->clientKey = $config['TOSS_CLIENT_KEY'];
-        $this->apiUrl = $config['TOSS_API_URL'];
+        $this->apiKey = $_ENV['TOSS_SECRET_KEY'];
+        $this->clientKey = $_ENV['TOSS_CLIENT_KEY'];
+        $this->apiUrl = $_ENV['TOSS_API_URL'];
     }
 
+    /**
+     * @return Toss
+     */
     public static function getInstance(): self
     {
         if (self::$instance === null) {
@@ -34,7 +35,11 @@ class Toss
     private function __clone() {}
     private function __wakeup() {}
 
-    //결제 생성
+    /**
+     * 결제 생성
+     * @param $orderData
+     * @return array
+     */
     public function initiatePayment($orderData): array
     {
         $paymentData = [
@@ -52,6 +57,13 @@ class Toss
         ];
     }
 
+    /**
+     * @param $paymentKey
+     * @param $orderId
+     * @param $amount
+     * @return mixed
+     * @throws Exception
+     */
     public function approve($paymentKey, $orderId, $amount)
     {
         $response = $this->request(
@@ -70,6 +82,12 @@ class Toss
         return $response;
     }
 
+    /**
+     * @param $paymentKey
+     * @param string $cancelReason
+     * @return mixed
+     * @throws Exception
+     */
     public function cancel($paymentKey, $cancelReason = '고객 요청')
     {
         $response = $this->request(
@@ -131,17 +149,26 @@ class Toss
         return $result;
     }
 
+    /**
+     * @return string
+     */
     private function getSuccessUrl(): string
     {
         return $_ENV['APP_URL'] . '/payment/api?action=success';
     }
 
+    /**
+     * @return string
+     */
     private function getFailUrl(): string
     {
-        return $_ENV['APP_URL'] . '/payment/fail';
+        return $_ENV['APP_URL'] . '/payment/api?action=fail';
     }
 
-    public function getClientKey()
+    /**
+     * @return string
+     */
+    public function getClientKey(): string
     {
         return $this->clientKey;
     }

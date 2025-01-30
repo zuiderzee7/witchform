@@ -40,6 +40,8 @@ try {
 
 /**
  * GET 메소드 핸들러
+ * @param $db
+ * @throws Exception
  */
 function handleGet($db) {
     $id = $_GET['id'] ?? null;
@@ -79,6 +81,8 @@ function handleGet($db) {
 
 /**
  * POST 메소드 핸들러 (데이터 생성)
+ * @param $db
+ * @throws Exception
  */
 function handlePost($db) {
     validateFields(['name', 'email', 'contact', 'address']);
@@ -103,6 +107,9 @@ function handlePost($db) {
 
 /**
  * PUT 메소드 핸들러 (데이터 수정)
+ * @param $db
+ * @param $_PUT
+ * @throws Exception
  */
 function handlePut($db, $_PUT) {
     if (!isset($_PUT['id'])) {
@@ -137,6 +144,8 @@ function handlePut($db, $_PUT) {
 
 /**
  * DELETE 메소드 핸들러 (데이터 삭제)
+ * @param $db
+ * @throws Exception
  */
 function handleDelete($db) {
     $id = $_POST['id'] ?? null;
@@ -166,8 +175,13 @@ function handleDelete($db) {
 
 /**
  * 필수 필드 검증 함수
+ * @param $required_fields
+ * @param null $data
+ * @return bool
+ * @throws Exception
  */
-function validateFields($required_fields, $data = null) {
+function validateFields($required_fields, $data = null): bool
+{
     $data = $data ?? $_POST;
     $errors = [];
 
@@ -186,6 +200,8 @@ function validateFields($required_fields, $data = null) {
 
 /**
  * CSRF 토큰 검사 함수
+ * @param $token
+ * @throws Exception
  */
 function handleCsrf($token) {
     if (empty($token) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
@@ -195,6 +211,7 @@ function handleCsrf($token) {
 
 /**
  * 에러 핸들링 함수
+ * @param $e
  */
 function handleError($e)
 {

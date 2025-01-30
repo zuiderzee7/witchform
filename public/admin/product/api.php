@@ -46,6 +46,8 @@ try {
 
 /**
  * 상품 상세정보 조회 (GET)
+ * @param $db
+ * @throws Exception
  */
 function handleGet($db) {
     $id = $_GET['id'] ?? null;
@@ -76,6 +78,8 @@ function handleGet($db) {
 
 /**
  * 상품 생성 (POST)
+ * @param $db
+ * @throws Exception
  */
 function handlePost($db) {
     try {
@@ -130,6 +134,9 @@ function handlePost($db) {
 
 /**
  * 상품 수정 (PUT)
+ * @param $db
+ * @param $_PUT
+ * @throws Exception
  */
 function handlePut($db, $_PUT) {
     try {
@@ -190,6 +197,8 @@ function handlePut($db, $_PUT) {
 
 /**
  * 상품 삭제 (DELETE)
+ * @param $db
+ * @throws Exception
  */
 function handleDelete($db) {
     $id = $_POST['id'] ?? null;
@@ -219,6 +228,9 @@ function handleDelete($db) {
 
 /**
  * 필수 필드 검증
+ * @param $required_fields
+ * @param null $data
+ * @return bool
  * @throws Exception
  */
 function validateFields($required_fields, $data = null): bool
@@ -250,6 +262,7 @@ function validateFields($required_fields, $data = null): bool
 
 /**
  * CSRF 토큰 검증
+ * @param $token
  * @throws Exception
  */
 function handleCsrf($token) {
@@ -260,6 +273,7 @@ function handleCsrf($token) {
 
 /**
  * 에러 핸들링 함수
+ * @param $e
  */
 function handleError($e)
 {

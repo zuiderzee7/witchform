@@ -53,7 +53,13 @@ try {
     exit;
 }
 
-// 주문 후 결제 진행, 리턴 값 기반 결제 처리 진행
+/**
+ * 주문 후 결제 진행, 리턴 값 기반 결제 처리 진행
+ * @param $db
+ * @param $toss
+ * @param $data
+ * @throws Exception
+ */
 function handlePaymentInitiate($db, $toss, $data) {
     $orderNumber = $data['order_number'] ?? null;
     $amount = $data['amount'] ?? null;
@@ -76,26 +82,76 @@ function handlePaymentInitiate($db, $toss, $data) {
         throw new Exception('유효하지 않은 주문입니다.');
     }
 
-    // 결제 정보 생성
-    $stmt = $db->prepare("
-        INSERT INTO payments (
-            order_id, payment_type, amount, status
-        ) VALUES (
-            :order_id, 'CARD', :amount, 'ready'
-        )
-    ");
+    $db->beginTransaction();
 
-    $stmt->execute([
-        'order_id' => $order['id'],
-        'amount' => $amount
-    ]);
+    try {
+        // 기존 결제 정보 확인
+        $checkStmt = $db->prepare("
+            SELECT id 
+            FROM payments 
+            WHERE order_id = :order_id
+        ");
+        $checkStmt->execute(['order_id' => $order['id']]);
+        $existingPayment = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
-    header('Content-Type: application/json');
-    echo json_encode($toss->initiatePayment($data));
-    exit;
+        if ($existingPayment) {
+            // 기존 결제 정보 업데이트
+            $updateStmt = $db->prepare("
+                UPDATE payments 
+                SET amount = :amount,
+                    status = 'ready',
+                    updated_dt = NOW()
+                WHERE order_id = :order_id
+            ");
+            $updateStmt->execute([
+                'order_id' => $order['id'],
+                'amount' => $amount
+            ]);
+        } else {
+            // 새로운 결제 정보 생성
+            $insertStmt = $db->prepare("
+                INSERT INTO payments (
+                    order_id, 
+                    payment_type, 
+                    amount, 
+                    status,
+                    created_dt,
+                    updated_dt
+                ) VALUES (
+                    :order_id, 
+                    'CARD', 
+                    :amount, 
+                    'ready',
+                    NOW(),
+                    NOW()
+                )
+            ");
+            $insertStmt->execute([
+                'order_id' => $order['id'],
+                'amount' => $amount
+            ]);
+        }
+
+        $db->commit();
+
+        header('Content-Type: application/json');
+        echo json_encode($toss->initiatePayment($data));
+        exit;
+
+    } catch (Exception $e) {
+        $db->rollBack();
+        throw $e;
+    }
 }
 
-//결제 완료 처리 시
+
+/**
+ * 결제 완료 처리 시
+ * @param $db
+ * @param $toss
+ * @param $params
+ * @throws Exception
+ */
 function handlePaymentSuccess($db, $toss, $params) {
     $paymentKey = $params['paymentKey'] ?? null;
     $orderId = $params['orderId'] ?? null;
@@ -137,20 +193,21 @@ function handlePaymentSuccess($db, $toss, $params) {
 
         $db->commit();
 
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'redirect' => '/payment/complete?order_id=' . $orderId
-        ]);
+        header('Location: /');
         exit;
-
     } catch (Exception $e) {
         $db->rollBack();
         throw $e;
     }
 }
 
-//결제 취소 처리
+/**
+ * 결제 취소 처리
+ * @param $db
+ * @param $toss
+ * @param $data
+ * @throws Exception
+ */
 function handlePaymentCancel($db, $toss, $data) {
     $orderNumber = $data['order_number'] ?? null;
 
@@ -158,9 +215,9 @@ function handlePaymentCancel($db, $toss, $data) {
         throw new Exception('필수 파라미터가 누락되었습니다.');
     }
 
-    // 결제 정보 조회
+    // 결제 정보 조회 (company_id도 함께 조회하도록 수정)
     $stmt = $db->prepare("
-        SELECT p.*, o.order_number, o.id as order_id
+        SELECT p.*, o.order_number, o.id as order_id, o.company_id
         FROM payments p
         JOIN orders o ON p.order_id = o.id
         WHERE o.order_number = :order_number 
@@ -175,6 +232,7 @@ function handlePaymentCancel($db, $toss, $data) {
 
     $db->beginTransaction();
     try {
+        // 토스 결제 취소 처리
         $result = $toss->cancel($payment['mid']);
 
         // 결제 상태 업데이트
@@ -200,19 +258,52 @@ function handlePaymentCancel($db, $toss, $data) {
         ");
         $stmt->execute(['order_id' => $payment['order_id']]);
 
+        // 주문 상품 정보 조회
+        $itemStmt = $db->prepare("
+            SELECT product_id, quantity 
+            FROM order_items 
+            WHERE order_id = :order_id
+        ");
+        $itemStmt->execute(['order_id' => $payment['order_id']]);
+        $orderItems = $itemStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 각 상품의 재고 수량 증가
+        $updateStmt = $db->prepare("
+            UPDATE product_inventories 
+            SET current_inventory = current_inventory + :quantity
+            WHERE product_id = :product_id 
+            AND company_id = :company_id
+        ");
+
+        foreach ($orderItems as $item) {
+            $updateResult = $updateStmt->execute([
+                'product_id' => $item['product_id'],
+                'company_id' => $payment['company_id'],
+                'quantity' => $item['quantity']
+            ]);
+
+            if (!$updateResult) {
+                throw new Exception('재고 수량 업데이트에 실패했습니다.');
+            }
+        }
+
         $db->commit();
 
         header('Content-Type: application/json');
         echo json_encode(['success' => true]);
         exit;
-
     } catch (Exception $e) {
         $db->rollBack();
         throw $e;
     }
 }
 
-// 결제 실패 시
+/**
+ * 결제 실패 시
+ * @param $db
+ * @param $data
+ * @throws Exception
+ */
 function handlePaymentFail($db, $data) {
     $orderId = $data['orderId'] ?? null;
     $message = $data['message'] ?? '결제 실패';
@@ -240,14 +331,8 @@ function handlePaymentFail($db, $data) {
 
         $db->commit();
 
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'message' => $message,
-            'redirect' => '/payment/fail?order_id=' . $orderId
-        ]);
+        header('Location: /');
         exit;
-
     } catch (Exception $e) {
         $db->rollBack();
         throw $e;

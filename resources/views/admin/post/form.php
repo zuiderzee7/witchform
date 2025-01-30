@@ -83,7 +83,7 @@ $csrf_token = $_SESSION['csrf_token'];
 
                     <li class="grid gap-4 py-4">
                         <div class="space-y-4">
-                            <label class="block text-sm font-medium text-gray-700">배송 설정</label>
+                            <label class="block text-sm font-medium text-gray-700">배송 설정 (주문 존재 시 수정 불가)</label>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>

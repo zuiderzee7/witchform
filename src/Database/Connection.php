@@ -12,14 +12,16 @@ class Connection {
         $dotenv = Dotenv::createImmutable(BASE_PATH . '/');
         $dotenv->safeLoad();
 
-        $config = require BASE_PATH . '/config/database.php';
-
         try {
             $this->pdo = new \PDO(
-                "mysql:host={$config['host']};dbname={$config['dbname']};charset=utf8mb4",
-                $config['username'],
-                $config['password'],
-                $config['options']
+                "mysql:host={$_ENV['DB_HOST']};dbname={$_ENV['DB_NAME']};charset=utf8mb4",
+                $_ENV['DB_USER'],
+                $_ENV['DB_PASSWORD'],
+                [
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                    \PDO::ATTR_EMULATE_PREPARES => false
+                ]
             );
         } catch (\PDOException $e) {
             throw new \Exception("Connection failed: " . $e->getMessage());
