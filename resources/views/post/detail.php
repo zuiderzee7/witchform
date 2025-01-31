@@ -185,21 +185,21 @@ $csrf_token = $_SESSION['csrf_token'];
                     <div>
                         <label class="block text-sm font-medium text-gray-700">주문자명</label>
                         <input type="text" name="customer_name" required autocomplete="off"
-                               value="테스터"
+                               value=""
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">이메일</label>
                         <input type="email" name="customer_email" required autocomplete="off"
-                               value="test@naver.com"
+                               value=""
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">연락처</label>
                         <input type="tel" name="customer_phone" required autocomplete="off"
-                               value="010-9103-1608"
+                               value=""
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     </div>
 
@@ -214,7 +214,7 @@ $csrf_token = $_SESSION['csrf_token'];
                         <div class="mt-2">
                             <label class="block text-sm font-medium text-gray-700">주소</label>
                             <input type="text" name="address" required autocomplete="off"
-                                   value="서울시 마포구 성미산로" maxlength="50"
+                                   value="서울" maxlength="50"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                         </div>
                     </div>
