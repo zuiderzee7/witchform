@@ -56,12 +56,12 @@
                             <div class="flex justify-between items-start">
                                 <div class="space-y-1">
                                     <div class="flex items-center space-x-2">
-                                    <span class="font-medium">
-                                        주문번호: <?=$order['id']?>) <?= htmlspecialchars($order['order_number']) ?>
-                                    </span>
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full <?= $status['class'] ?>">
-                                        <?= $status['label'] ?>
-                                    </span>
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full <?= $status['class'] ?>">
+                                            <?= $status['label'] ?>
+                                        </span>
+                                        <span class="font-medium">
+                                            주문번호: <?=$order['id']?>) <?= htmlspecialchars($order['order_number']) ?>
+                                        </span>
                                     </div>
                                     <p class="text-sm text-gray-600">
                                         <?= isset($order['customer_name']) ? htmlspecialchars(\Utils\MaskingUtil::name($order['customer_name'])) : '' ?>
@@ -75,12 +75,12 @@
                             <?php if (isset($order['payment_mid'])): ?>
                                 <div class="bg-gray-50 rounded-lg p-3 ml-4">
                                     <div class="flex justify-between items-center">
-                                        <div class="space-y-1">
+                                        <div class="space-x-2">
+                                            <span class="mr-2 px-2 py-1 text-xs font-medium rounded-full <?= $status['class'] ?>">
+                                                <?= $payment_status['label'] ?> <?=$order['payment_status']?>
+                                            </span>
                                             <span class="text-sm font-medium">
                                                 결제번호: <?= htmlspecialchars($order['payment_mid']) ?>
-                                            </span>
-                                            <span class="px-2 py-1 text-xs font-medium rounded-full <?= $status['class'] ?>">
-                                                <?= $payment_status['label'] ?> <?=$order['payment_status']?>
                                             </span>
                                             <p class="text-sm text-gray-600">
                                                 결제일시: <?= (new DateTime($order['payment_created_dt']))->format('Y-m-d H:i:s') ?>
@@ -88,9 +88,8 @@
                                         </div>
                                         <?php if($order['payment_status'] === 'paid'): ?>
                                             <button onclick="cancelPayment('<?=$order['order_number']?>', '<?= $order['payment_mid'] ?>')"
-                                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">
-                                                결제취소
-                                            </button>
+                                                    class="bg-red-500 hover:bg-red-600 text-white px-2 py-2 rounded-md text-sm whitespace-pre"
+                                            >결제취소</button>
                                         <?php endif; ?>
                                     </div>
                                 </div>

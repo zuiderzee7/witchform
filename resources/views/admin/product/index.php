@@ -50,11 +50,11 @@
                             </div>
                             <div class="text-center space-x-px">
                                 <button onclick="editProduct(<?= $item['id'] ?>)"
-                                        class="px-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                                        class="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                                     수정
                                 </button>
                                 <button onclick="deleteProduct(<?= $item['id'] ?>)"
-                                        class="px-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+                                        class="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
                                     삭제
                                 </button>
                             </div>

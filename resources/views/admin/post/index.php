@@ -41,10 +41,10 @@
                                 <?= htmlspecialchars($post['content']) ?>
                             </div>
 
-                            <div class="text-center space-x-1">
+                            <div class="text-center space-x-px">
                                 <button type="button"
                                         onclick="editPost(<?= (int) $post['id'] ?>)"
-                                        class="px-2 py-1 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors">
+                                        class="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                                     수정
                                 </button>
                                 <button type="button"
